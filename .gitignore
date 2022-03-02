@@ -1,0 +1,14 @@
+*.pyc
+index.html
+
+
+.idea/
+__pycache__/
+assets/
+css/
+data/
+fonts/
+html/
+js/
+scss/
+venv/
