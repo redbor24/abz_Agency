@@ -1,10 +1,7 @@
-from pathlib import Path
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 import data_generator
-
-# HTML_SUBPATH = 'html/'
 
 
 def main():

@@ -2,16 +2,46 @@ from pathlib import Path
 from random import shuffle
 from pprint import pprint
 
+from dateutil.rrule import rrule, DAILY
+import datetime
+import random
+
 """
+STRUCT_DESCRIPTOR
+Содержит количество ставок на каждом уровне и наименование должности на нём.
 Числа означают количество узлов на каждом уровне иерархии, кроме последнего,
 и, соответственно, количество самих уровней в иерархии.
-Для последнего уровня количество не задаётся
+Для последнего уровня количество ставок задаётся отдельной константой 
+LAST_LEVEL_ELEM_COUNT.
 """
-STRUCT_DESCRIPTOR = [2, 3, 5, 10]
-ALL_PERSON_COUNT = 5000
-LAST_LEVEL_ELEM_COUNT = 4
-# LAST_LEVEL_ELEM_COUNT = 150
+STRUCT_DESCRIPTOR = [
+    {'quantity': 2, 'position': 'генеральный директор'},
+    {'quantity': 3, 'position': 'руководитель департамента'},
+    {'quantity': 5, 'position': 'начальник отдела'},
+    {'quantity': 10, 'position': 'ведущий специалист'},
+]
+
+# Наименование должности на низшем уровне иерархии
+ORDINARY_EMPLOYEE = 'инженер'
+
+ALL_PERSON_COUNT = 10000
+LAST_LEVEL_ELEM_COUNT = 150
+
 DATA_FILES_SUBPATH = 'data/'
+
+
+class LocalException(Exception):
+    pass
+
+
+def get_random_date(year_from, year_to):
+    return random.choice(
+        list(
+            rrule(DAILY,
+                  dtstart=datetime.date(year_from, 1, 1),
+                  until=datetime.date(year_to, 1, 1))
+        )
+    )
 
 
 def read_file(filename):
@@ -43,8 +73,8 @@ def generate_persons(count):
                     persons.append(person)
                     person_id += 1
                     if person_id == count // 2:
-                        raise Exception
-    except:
+                        raise LocalException
+    except LocalException:
         pass
 
     woman_count = count - person_id
@@ -62,8 +92,8 @@ def generate_persons(count):
                     person_id += 1
                     woman_count -= 1
                     if woman_count == 0:
-                        raise Exception
-    except:
+                        raise LocalException
+    except LocalException:
         pass
 
     shuffle(persons)
@@ -87,7 +117,6 @@ def fill_struct():
             'first_name': 'root',
             'middle_name': None,
             'second_name': None,
-            # 'child_count': 1,
             'childs': fill_element(0, persons)
         }
     return root
@@ -96,9 +125,16 @@ def fill_struct():
 def fill_element(level, persons):
     if level > len(STRUCT_DESCRIPTOR) - 1:
         element_persons = get_persons(persons, LAST_LEVEL_ELEM_COUNT)
+        for element in element_persons:
+            element['position'] = ORDINARY_EMPLOYEE
+            element['employment_date'] = get_random_date(2010, 2022)
         return element_persons
 
-    element_persons = get_persons(persons, STRUCT_DESCRIPTOR[level])
+    element_persons = get_persons(persons, STRUCT_DESCRIPTOR[level]['quantity'])
+    for element in element_persons:
+        element['position'] = STRUCT_DESCRIPTOR[level]['position']
+        element['employment_date'] = get_random_date(2010, 2022)
+
     for person in element_persons:
         person['childs'] = fill_element(level + 1, persons)
 
@@ -107,11 +143,9 @@ def fill_element(level, persons):
 
 def render_struct():
     staff = fill_struct()
-    pprint(staff)
     rendered_struct = ''
     if staff:
         for element in staff['childs']:
-        # return f"<ul>{render_element(staff['childs'][0])}</ul>"
             rendered_struct += render_element(element)
 
     return rendered_struct
@@ -119,8 +153,10 @@ def render_struct():
 
 def render_element(element):
     rendered_element = f'<li>{element["second_name"]}' \
-                        f' {element["first_name"]}' \
-                        f' {element["middle_name"]}'
+                       f' {element["first_name"]}' \
+                       f' {element["middle_name"]}' \
+                       f', {element["position"]}' \
+                       f', {element["employment_date"].strftime("%d.%m.%Y")}'
 
     if element['childs']:
         rendered_element += '<ul>'
@@ -134,6 +170,4 @@ def render_element(element):
 
 
 if __name__ == '__main__':
-    # staff_struct = fill_struct()
-    # pprint(staff_struct)
     print(render_struct())
