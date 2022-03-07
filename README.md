@@ -19,7 +19,8 @@
 ```
 pip install -r requirements.txt
 ```
-
+### Настройка
+ALL_PERSON_COUNT - общее количество сотрудников для отображения 
 ### Запуск
 ```
 python main.py

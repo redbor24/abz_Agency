@@ -3,6 +3,8 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 import data_generator
 
+ALL_PERSON_COUNT = 5000
+
 
 def main():
     env = Environment(
@@ -13,7 +15,7 @@ def main():
     template = env.get_template('template.html')
 
     rendered_page = template.render(
-        staff=data_generator.render_struct()
+        staff=data_generator.render_struct(ALL_PERSON_COUNT)
     )
 
     with open('index.html', 'w', encoding="utf8") as file:

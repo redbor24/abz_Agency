@@ -24,7 +24,6 @@ STRUCT_DESCRIPTOR = [
 # Наименование должности на низшем уровне иерархии
 ORDINARY_EMPLOYEE = 'инженер'
 
-ALL_PERSON_COUNT = 10000
 LAST_LEVEL_ELEM_COUNT = 150
 
 DATA_FILES_SUBPATH = 'data/'
@@ -110,8 +109,8 @@ def get_persons(persons, count):
     return ret_persons
 
 
-def fill_struct():
-    persons = generate_persons(ALL_PERSON_COUNT)
+def fill_struct(person_count):
+    persons = generate_persons(person_count)
     root = {
             'id': 0,
             'first_name': 'root',
@@ -141,8 +140,8 @@ def fill_element(level, persons):
     return element_persons
 
 
-def render_struct():
-    staff = fill_struct()
+def render_struct(person_count):
+    staff = fill_struct(person_count)
     rendered_struct = ''
     if staff:
         for element in staff['childs']:
